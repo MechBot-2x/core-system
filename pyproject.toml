@@ -1,0 +1,195 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neural-nexus"
+version = "0.1.0"
+description = "Plataforma de IA Distribuida para Edge Computing"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Neural Nexus Team", email = "team@neuralnexus.dev"}
+]
+keywords = ["edge-computing", "ai", "neuromorphic", "distributed", "inference"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: System :: Distributed Computing",
+]
+
+dependencies = [
+    # Core ML/AI
+    "onnxruntime>=1.16.0",
+    "numpy>=1.21.0",
+    "torch>=2.0.0",
+    "transformers>=4.30.0",
+    
+    # Distributed Computing
+    "grpcio>=1.54.0",
+    "grpcio-tools>=1.54.0",
+    "paho-mqtt>=1.6.0",
+    "celery>=5.3.0",
+    
+    # Data Processing
+    "pandas>=1.5.0",
+    "scipy>=1.9.0",
+    "scikit-learn>=1.3.0",
+    
+    # Monitoring & Logging
+    "prometheus-client>=0.17.0",
+    "structlog>=23.1.0",
+    
+    # Configuration & Utils
+    "pydantic>=2.0.0",
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "python-dotenv>=1.0.0",
+    
+    # Hardware specific
+    "RPi.GPIO>=0.7.1; platform_machine=='armv7l'",
+    "jetson-stats>=4.2.0; platform_machine=='aarch64'",
+    
+    # Development
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.4.0",
+    "flake8>=6.0.0",
+    "pre-commit>=3.0.0",
+]
+
+gpu = [
+    "torch>=2.0.0+cu118",
+    "torchvision>=0.15.0+cu118",
+    "tensorrt>=8.6.0",
+    "pycuda>=2022.2",
+]
+
+raspberry-pi = [
+    "RPi.GPIO>=0.7.1",
+    "picamera2>=0.3.12",
+    "gpiozero>=1.6.2",
+]
+
+jetson = [
+    "jetson-stats>=4.2.0",
+    "opencv-python>=4.8.0",
+    "pycuda>=2022.2",
+]
+
+monitoring = [
+    "grafana-api>=1.0.3",
+    "influxdb-client>=1.36.0",
+    "elasticsearch>=8.8.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/mechmind-dwv/core-system"
+Documentation = "https://neural-nexus.readthedocs.io"
+Repository = "https://github.com/mechmind-dwv/core-system"
+"Bug Tracker" = "https://github.com/mechmind-dwv/core-system/issues"
+
+[project.scripts]
+neural-nexus = "neural_nexus.cli:main"
+nn-node = "neural_nexus.node:main"
+nn-orchestrator = "neural_nexus.orchestrator:main"
+
+[tool.setuptools.packages.find]
+where = ["core", "edge_modules"]
+include = ["neural_nexus*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | target
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["neural_nexus"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = [
+    "tests",
+]
+python_files = [
+    "test_*.py",
+    "*_test.py",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "gpu: marks tests that require GPU",
+    "raspberry_pi: marks tests that require Raspberry Pi hardware",
+    "jetson: marks tests that require NVIDIA Jetson hardware",
+]
+
+[tool.coverage.run]
+source = ["neural_nexus"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

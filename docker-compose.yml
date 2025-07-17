@@ -1,0 +1,207 @@
+version: '3.8'
+
+services:
+  # 🧠 Core Neural Nexus Services
+  neural-nexus-orchestrator:
+    build: 
+      context: .
+      dockerfile: Dockerfile.orchestrator
+    container_name: nn-orchestrator
+    ports:
+      - "8080:8080"  # HTTP API
+      - "50051:50051"  # gRPC
+    environment:
+      - RUST_LOG=info
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/neural_nexus
+      - REDIS_URL=redis://redis:6379
+      - MQTT_BROKER=mqtt://mosquitto:1883
+    depends_on:
+      - postgres
+      - redis
+      - mosquitto
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    networks:
+      - neural-nexus
+    restart: unless-stopped
+
+  neural-nexus-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: nn-node
+    ports:
+      - "8081:8081"  # Node API
+    environment:
+      - RUST_LOG=info
+      - NODE_ID=${NODE_ID:-node-001}
+      - ORCHESTRATOR_URL=http://neural-nexus-orchestrator:8080
+      - MQTT_BROKER=mqtt://mosquitto:1883
+    depends_on:
+      - neural-nexus-orchestrator
+      - mosquitto
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    networks:
+      - neural-nexus
+    restart: unless-stopped
+
+  # 🔧 Infrastructure Services
+  postgres:
+    image: postgres:15-alpine
+    container_name: nn-postgres
+    environment:
+      - POSTGRES_DB=neural_nexus
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - neural-nexus
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: nn-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - neural-nexus
+    restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: nn-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+    networks:
+      - neural-nexus
+    restart: unless-stopped
+
+  # 📊 Monitoring Stack
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nn-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - neural-nexus
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nn-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=neural-nexus
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - neural-nexus
+    restart: unless-stopped
+
+  # 🧪 Development & Testing
+  jupyter:
+    image: jupyter/tensorflow-notebook:latest
+    container_name: nn-jupyter
+    ports:
+      - "8888:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./data:/home/jovyan/data
+      - ./models:/home/jovyan/models
+    networks:
+      - neural-nexus
+    restart: unless-stopped
+
+  # 🎯 Edge Simulator (for testing)
+  edge-simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile.edge
+    container_name: nn-edge-simulator
+    environment:
+      - DEVICE_TYPE=simulator
+      - ORCHESTRATOR_URL=http://neural-nexus-orchestrator:8080
+      - MQTT_BROKER=mqtt://mosquitto:1883
+    depends_on:
+      - neural-nexus-orchestrator
+      - mosquitto
+    volumes:
+      - ./edge_modules/simulator:/app/simulator
+    networks:
+      - neural-nexus
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  mosquitto_data:
+  mosquitto_logs:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  neural-nexus:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# 🚀 Profiles para diferentes entornos
+profiles:
+  development:
+    services:
+      - neural-nexus-orchestrator
+      - neural-nexus-node
+      - postgres
+      - redis
+      - mosquitto
+      - jupyter
+
+  production:
+    services:
+      - neural-nexus-orchestrator
+      - neural-nexus-node
+      - postgres
+      - redis
+      - mosquitto
+      - prometheus
+      - grafana
+
+  testing:
+    services:
+      - neural-nexus-orchestrator
+      - neural-nexus-node
+      - postgres
+      - redis
+      - mosquitto
+      - edge-simulator

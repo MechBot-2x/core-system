@@ -1,0 +1,49 @@
+# k8s/orchestrator.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neural-nexus-orchestrator
+  namespace: neural-nexus
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: neural-nexus-orchestrator
+  template:
+    metadata:
+      labels:
+        app: neural-nexus-orchestrator
+    spec:
+      containers:
+      - name: orchestrator
+        image: neuralnexus/orchestrator:latest
+        ports:
+        - containerPort: 8080
+        - containerPort: 50051
+        env:
+        - name: RUST_LOG
+          value: "info"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: neural-nexus-secrets
+              key: database-url
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
