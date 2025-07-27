@@ -1,8 +1,1 @@
-[package]
-name = "neural-nexus-core"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-tokio = { version = "1.0", features = ["full"] }
-prost = "0.12"
+[package]\nname = "neural-nexus-core"\nversion = "0.1.0"\nedition = "2021"
