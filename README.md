@@ -7,7 +7,8 @@
 
 *Hecho con ❤️ por la comunidad de desarrolladores de IA distribuida*
 
-</div># 🧠 Neural Nexus - Core System
+</div>
+# 🧠 Neural Nexus - Core System
 
 [![Build Status](https://github.com/mechmind-dwv/core-system/actions/workflows/build.yml/badge.svg)](https://github.com/mechmind-dwv/core-system/actions)
 [![Edge Latency](https://img.shields.io/badge/edge_latency-<2ms-green)](https://neural-nexus.dev/benchmarks)
