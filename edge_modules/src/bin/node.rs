@@ -512,4 +512,367 @@ async fn heartbeat_service(state: NodeState) {
 /// Send heartbeat to orchestrator
 async fn send_heartbeat(state: &NodeState) -> Result<()> {
     let current_metrics = state.metrics.get_current_snapshot().await?;
-    let status =
+    let status = state.status.read().await.clone();
+
+    let heartbeat = NodeHeartbeat {
+        node_id: state.node_id.clone(),
+        timestamp: chrono::Utc::now(),
+        status,
+        metrics: current_metrics,
+        active_models: state.model_manager.get_loaded_models().await?,
+    };
+
+    state.orchestrator_client.send_heartbeat(heartbeat).await
+        .context("Failed to send heartbeat to orchestrator")?;
+
+    debug!("💓 Heartbeat sent successfully");
+    Ok(())
+}
+
+/// Node heartbeat structure
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NodeHeartbeat {
+    pub node_id: String,
+    pub timestamp: chrono::DateTime<chrono::Utc>,
+    pub status: NodeStatus,
+    pub metrics: NodeMetricsSnapshot,
+    pub active_models: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NodeMetricsSnapshot {
+    pub cpu_usage: f64,
+    pub memory_usage: f64,
+    pub gpu_usage: Option<f64>,
+    pub network_rx_bytes: u64,
+    pub network_tx_bytes: u64,
+    pub inference_count: u64,
+    pub average_latency_ms: f64,
+    pub error_count: u64,
+    pub uptime_seconds: u64,
+}
+
+/// Background metrics collection service
+async fn metrics_collection_service(state: NodeState) {
+    let mut interval = tokio::time::interval(
+        std::time::Duration::from_secs(10)
+    );
+
+    loop {
+        interval.tick().await;
+        
+        if let Err(e) = collect_system_metrics(&state).await {
+            warn!("Failed to collect system metrics: {}", e);
+        }
+    }
+}
+
+/// Collect comprehensive system metrics
+async fn collect_system_metrics(state: &NodeState) -> Result<()> {
+    use sysinfo::{System, SystemExt, NetworkExt, ProcessorExt};
+    
+    let mut system = System::new_all();
+    system.refresh_all();
+
+    // CPU metrics
+    let cpu_usage = system.global_processor_info().cpu_usage() as f64 / 100.0;
+    state.metrics.record_cpu_usage(cpu_usage).await;
+
+    // Memory metrics
+    let memory_usage = (system.used_memory() as f64) / (system.total_memory() as f64);
+    state.metrics.record_memory_usage(memory_usage).await;
+
+    // Network metrics
+    let networks = system.networks();
+    let mut total_rx = 0u64;
+    let mut total_tx = 0u64;
+    
+    for (_, network) in networks {
+        total_rx += network.received();
+        total_tx += network.transmitted();
+    }
+    
+    state.metrics.record_network_io(total_rx, total_tx).await;
+
+    // GPU metrics (if available)
+    if let Ok(gpu_usage) = get_gpu_usage().await {
+        state.metrics.record_gpu_usage(gpu_usage).await;
+    }
+
+    // Temperature metrics (if available)
+    if let Ok(temp) = get_cpu_temperature().await {
+        state.metrics.record_temperature(temp).await;
+    }
+
+    debug!("📊 System metrics collected: CPU={:.1}%, Memory={:.1}%", 
+           cpu_usage * 100.0, memory_usage * 100.0);
+    
+    Ok(())
+}
+
+/// Get GPU usage if available
+async fn get_gpu_usage() -> Result<f64> {
+    let output = tokio::process::Command::new("nvidia-smi")
+        .arg("--query-gpu=utilization.gpu")
+        .arg("--format=csv,noheader,nounits")
+        .output()
+        .await?;
+
+    if output.status.success() {
+        let usage_str = String::from_utf8(output.stdout)?;
+        let usage = usage_str.trim().parse::<f64>()?;
+        Ok(usage / 100.0)
+    } else {
+        anyhow::bail!("Failed to get GPU usage");
+    }
+}
+
+/// Get CPU temperature if available
+async fn get_cpu_temperature() -> Result<f64> {
+    // Try to read from thermal zone (Linux)
+    if let Ok(temp_str) = tokio::fs::read_to_string("/sys/class/thermal/thermal_zone0/temp").await {
+        if let Ok(temp_millic) = temp_str.trim().parse::<i32>() {
+            return Ok(temp_millic as f64 / 1000.0);
+        }
+    }
+
+    // Try vcgencmd for Raspberry Pi
+    let output = tokio::process::Command::new("vcgencmd")
+        .arg("measure_temp")
+        .output()
+        .await?;
+
+    if output.status.success() {
+        let temp_str = String::from_utf8(output.stdout)?;
+        if let Some(temp_part) = temp_str.strip_prefix("temp=").and_then(|s| s.strip_suffix("'C\n")) {
+            if let Ok(temp) = temp_part.parse::<f64>() {
+                return Ok(temp);
+            }
+        }
+    }
+
+    anyhow::bail!("Unable to read CPU temperature");
+}
+
+/// Background health monitoring service
+async fn health_monitoring_service(state: NodeState) {
+    let mut interval = tokio::time::interval(
+        std::time::Duration::from_secs(30)
+    );
+
+    loop {
+        interval.tick().await;
+        
+        if let Err(e) = perform_health_check(&state).await {
+            error!("Health check failed: {}", e);
+        }
+    }
+}
+
+/// Perform comprehensive health check
+async fn perform_health_check(state: &NodeState) -> Result<()> {
+    let mut current_status = state.status.read().await.clone();
+    let metrics = state.metrics.get_current_snapshot().await?;
+
+    // Check CPU usage
+    if metrics.cpu_usage > 0.9 {
+        warn!("⚠️ High CPU usage detected: {:.1}%", metrics.cpu_usage * 100.0);
+        current_status = NodeStatus::Overloaded;
+    }
+
+    // Check memory usage
+    if metrics.memory_usage > 0.85 {
+        warn!("⚠️ High memory usage detected: {:.1}%", metrics.memory_usage * 100.0);
+        if current_status == NodeStatus::Healthy {
+            current_status = NodeStatus::Degraded;
+        }
+    }
+
+    // Check error rate
+    let error_rate = if metrics.inference_count > 0 {
+        metrics.error_count as f64 / metrics.inference_count as f64
+    } else {
+        0.0
+    };
+
+    if error_rate > 0.1 {
+        warn!("⚠️ High error rate detected: {:.1}%", error_rate * 100.0);
+        current_status = NodeStatus::Degraded;
+    }
+
+    // Check orchestrator connectivity
+    if let Err(_) = state.orchestrator_client.ping().await {
+        warn!("⚠️ Lost connection to orchestrator");
+        current_status = NodeStatus::Degraded;
+    }
+
+    // Check disk space
+    if let Ok(disk_usage) = get_disk_usage().await {
+        if disk_usage > 0.9 {
+            warn!("⚠️ Low disk space: {:.1}% used", disk_usage * 100.0);
+            current_status = NodeStatus::Degraded;
+        }
+    }
+
+    // Update status if changed
+    let mut status_guard = state.status.write().await;
+    if *status_guard != current_status {
+        info!("🔄 Node status changed: {:?} -> {:?}", *status_guard, current_status);
+        *status_guard = current_status;
+    }
+
+    Ok(())
+}
+
+/// Get disk usage percentage
+async fn get_disk_usage() -> Result<f64> {
+    use std::path::Path;
+    
+    let statvfs = nix::sys::statvfs::statvfs(Path::new("/"))?;
+    let total_space = statvfs.blocks() * statvfs.fragment_size();
+    let available_space = statvfs.blocks_available() * statvfs.fragment_size();
+    let used_space = total_space - available_space;
+    
+    Ok(used_space as f64 / total_space as f64)
+}
+
+/// Background model synchronization service
+async fn model_synchronization_service(state: NodeState) {
+    let mut interval = tokio::time::interval(
+        std::time::Duration::from_secs(300) // Check every 5 minutes
+    );
+
+    loop {
+        interval.tick().await;
+        
+        if let Err(e) = synchronize_models(&state).await {
+            warn!("Model synchronization failed: {}", e);
+        }
+    }
+}
+
+/// Synchronize models with orchestrator
+async fn synchronize_models(state: &NodeState) -> Result<()> {
+    debug!("🔄 Synchronizing models with orchestrator");
+
+    // Get available models from orchestrator
+    let available_models = state.orchestrator_client
+        .get_available_models().await?;
+
+    // Get currently loaded models
+    let loaded_models = state.model_manager.get_loaded_models().await?;
+
+    // Check for new models to download
+    for model_info in &available_models {
+        if !loaded_models.contains(&model_info.name) {
+            info!("📥 Downloading new model: {}", model_info.name);
+            
+            if let Err(e) = state.model_manager
+                .download_model(&model_info.name, &model_info.url).await {
+                error!("Failed to download model {}: {}", model_info.name, e);
+            }
+        }
+    }
+
+    // Check for outdated models to update
+    for model_name in &loaded_models {
+        if let Some(model_info) = available_models.iter()
+            .find(|m| m.name == *model_name) {
+            
+            let local_version = state.model_manager
+                .get_model_version(model_name).await?;
+            
+            if local_version != model_info.version {
+                info!("🔄 Updating model: {} {} -> {}", 
+                      model_name, local_version, model_info.version);
+                      
+                if let Err(e) = state.model_manager
+                    .update_model(model_name, &model_info.url).await {
+                    error!("Failed to update model {}: {}", model_name, e);
+                }
+            }
+        }
+    }
+
+    debug!("✅ Model synchronization completed");
+    Ok(())
+}
+
+/// Graceful shutdown handler
+pub async fn shutdown_node(state: &NodeState) -> Result<()> {
+    info!("🔄 Starting graceful shutdown...");
+
+    // Stop accepting new requests
+    *state.status.write().await = NodeStatus::Maintenance;
+
+    // Wait for current inferences to complete (with timeout)
+    let shutdown_timeout = tokio::time::Duration::from_secs(30);
+    let shutdown_deadline = tokio::time::Instant::now() + shutdown_timeout;
+
+    while state.metrics.get_active_inference_count().await > 0 {
+        if tokio::time::Instant::now() > shutdown_deadline {
+            warn!("⚠️ Shutdown timeout reached, forcing shutdown");
+            break;
+        }
+        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+    }
+
+    // Unload all models
+    if let Err(e) = state.model_manager.unload_all_models().await {
+        warn!("Failed to unload models: {}", e);
+    }
+
+    // Save final metrics
+    if let Err(e) = state.metrics.save_shutdown_metrics().await {
+        warn!("Failed to save shutdown metrics: {}", e);
+    }
+
+    // Update final status
+    *state.status.write().await = NodeStatus::Offline;
+
+    info!("✅ Node shutdown completed successfully");
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_hardware_detection() {
+        let hardware = detect_hardware_capabilities().await.unwrap();
+        
+        assert!(hardware.cpu_cores > 0);
+        assert!(hardware.memory_mb > 0);
+        assert!(!hardware.architecture.is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_node_capabilities() {
+        let hardware = crate::HardwareInfo {
+            cpu_cores: 4,
+            memory_mb: 4096,
+            gpu_available: true,
+            gpu_memory_mb: Some(8192),
+            architecture: "x86_64".to_string(),
+            power_consumption_watts: Some(50.0),
+        };
+
+        let config = NodeConfig::default();
+        let capabilities = determine_node_capabilities(&hardware, &config).await.unwrap();
+
+        assert!(capabilities.contains(&"inference".to_string()));
+        assert!(capabilities.contains(&"gpu-acceleration".to_string()));
+        assert!(capabilities.contains(&"federated-learning".to_string()));
+    }
+
+    #[test]
+    fn test_power_estimation() {
+        let power = estimate_power_consumption(4, 8192, true, "x86_64");
+        assert!(power > 20.0);
+        assert!(power < 200.0);
+
+        let arm_power = estimate_power_consumption(4, 4096, false, "aarch64");
+        assert!(arm_power < power); // ARM should use less power
+    }
+}
