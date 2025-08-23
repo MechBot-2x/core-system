@@ -1,0 +1,21 @@
+# monitoring/filebeat.yml
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /opt/neural-nexus/logs/*.log
+  fields:
+    service: neural-nexus
+    environment: ${ENVIRONMENT:production}
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  index: "neural-nexus-%{+yyyy.MM.dd}"
+
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644

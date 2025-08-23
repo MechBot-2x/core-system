@@ -1,0 +1,29 @@
+1. 🔍 Problemas Comunes
+Orchestrator no responde
+# Verificar logs
+kubectl logs deployment/neural-nexus-orchestrator -n neural-nexus
+
+# Verificar recursos
+kubectl top pods -n neural-nexus
+
+# Reiniciar servicio
+kubectl rollout restart deployment/neural-nexus-orchestrator -n neural-nexus
+
+# Verificar conectividad de red
+ping orchestrator.neural-nexus.com
+
+# Verificar certificados
+openssl s_client -connect orchestrator.neural-nexus.com:443
+
+# Reiniciar nodo edge
+docker restart neural-nexus-edge
+
+# Verificar métricas de rendimiento
+curl http://localhost:8080/metrics | grep inference_latency
+
+# Verificar uso de GPU (si aplica)
+nvidia-smi
+
+# Optimizar batch size
+curl -X POST http://localhost:8080/config \
+  -d '{"inference.batch_size": 16}'
