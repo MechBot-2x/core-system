@@ -1,0 +1,19 @@
+# Preparar Raspberry Pi
+sudo apt-get update
+sudo apt-get install -y docker.io
+sudo systemctl enable docker
+sudo usermod -aG docker pi
+
+# Instalar Neural Nexus
+docker run -d \
+  --name neural-nexus-rpi \
+  --restart unless-stopped \
+  -v /opt/neural-nexus:/app/data \
+  -v /opt/neural-nexus/config:/app/config \
+  -p 8080:8080 \
+  -e DEVICE_TYPE=raspberry-pi \
+  -e ORCHESTRATOR_URL=https://orchestrator.your-domain.com \
+  neuralnexus/raspberry-pi:latest
+
+# Verificar funcionamiento
+docker logs neural-nexus-rpi
