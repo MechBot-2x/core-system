@@ -41,3 +41,5 @@ frontend-backup/package-lock.json
 # Temporary files
 tmp/
 temp/
+venv/
+.venv/
