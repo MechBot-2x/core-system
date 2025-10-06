@@ -162,7 +162,7 @@ jobs:
         args: --release --target ${{ matrix.target }}
     
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: neural-nexus-${{ matrix.target }}
         path: target/${{ matrix.target }}/release/neural-nexus-*
@@ -336,7 +336,7 @@ jobs:
         safety check --json --output security-report.json || true
     
     - name: Upload security report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-report
         path: security-report.json
