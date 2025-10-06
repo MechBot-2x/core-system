@@ -1,0 +1,20 @@
+FROM python:3.8-alpine
+
+WORKDIR /app
+
+# Instala dependencias
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    linux-headers
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY edge_modules/simulator/ .
+
+# Crea usuario no-root
+RUN adduser -D -s /bin/sh edgeuser
+USER edgeuser
+
+CMD ["python", "simulator_main.py"]
