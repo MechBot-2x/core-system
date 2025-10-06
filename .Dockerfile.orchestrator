@@ -1,0 +1,47 @@
+# Usa una imagen base oficial de Rust
+FROM rust:1.70-alpine AS builder
+
+# Instala dependencias del sistema
+RUN apk add --no-cache \
+    musl-dev \
+    openssl-dev \
+    pkgconfig \
+    && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+# Copia los archivos de dependencias primero para aprovechar el cache de Docker
+COPY Cargo.toml Cargo.lock ./
+COPY orchestrator/Cargo.toml orchestrator/Cargo.toml
+
+# Construye las dependencias
+RUN mkdir -p orchestrator/src \
+    && echo "fn main() {}" > orchestrator/src/main.rs \
+    && cargo build --release
+
+# Copia el código fuente real
+COPY . .
+
+# Construye la aplicación
+RUN cargo build --release --bin neural-nexus-orchestrator
+
+# Imagen final más pequeña
+FROM alpine:latest
+
+RUN apk add --no-cache \
+    libgcc \
+    openssl \
+    ca-certificates \
+    && adduser -D -s /bin/sh appuser
+
+WORKDIR /app
+
+# Copia el binario desde el stage de construcción
+COPY --from=builder /app/target/release/neural-nexus-orchestrator .
+COPY --from=builder /app/config ./config
+
+USER appuser
+
+EXPOSE 8080 50051
+
+CMD ["./neural-nexus-orchestrator"]

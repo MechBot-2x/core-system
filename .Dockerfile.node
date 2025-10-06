@@ -1,0 +1,32 @@
+# Imagen base para el nodo
+FROM python:3.8-slim
+
+WORKDIR /app
+
+# Instala dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copia requirements e instala dependencias Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Instala Rust para compilación de componentes nativos
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Copia el código fuente
+COPY . .
+
+# Instala dependencias Rust
+COPY Cargo.toml Cargo.lock ./
+RUN cargo fetch
+
+# Crea directorios necesarios
+RUN mkdir -p /app/models /app/data /app/logs
+
+EXPOSE 8081
+
+CMD ["python", "-m", "edge_modules.generic.main"]
