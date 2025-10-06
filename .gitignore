@@ -1,1 +1,43 @@
-target/\n*.pyc\n.venv/\nnode_modules/
+# Dependencies
+node_modules/
+lucide-react/
+react/
+frontend/node_modules/
+frontend-backup/node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Docker
+.docker/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Large files
+*.map
+*.js.map
+frontend/package-lock.json
+frontend-backup/package-lock.json
+
+# Temporary files
+tmp/
+temp/
