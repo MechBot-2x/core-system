@@ -1,18 +1,4 @@
-```markdown
-import React, { useState, useRef } from 'react';
-import { Upload, FileText, Download, Plus, Trash2, Edit, Eye, Copy, Check } from 'lucide-react';
-
-const ReadmeIntegrator = () => {
-  const [mainReadme, setMainReadme] = useState('');
-  const [subFiles, setSubFiles] = useState([]);
-  const [integratedContent, setIntegratedContent] = useState('');
-  const [activeTab, setActiveTab] = useState('upload');
-  const [copied, setCopied] = useState(false);
-  const fileInputRef = useRef(null);
-
-  // Cargar el contenido inicial del README de Neural Nexus
-  React.useEffect(() => {
-    const initialContent = `# 🧠 Neural Nexus - Core System
+# 🧠 Neural Nexus - Core System
 
 [![Build Status](https://github.com/mechmind-dwv/core-system/actions/workflows/build.yml/badge.svg)](https://github.com/mechmind-dwv/core-system/actions)
 [![Edge Latency](https://img.shields.io/badge/edge_latency-<2ms-green)](https://neural-nexus.dev/benchmarks)
