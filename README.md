@@ -6,7 +6,6 @@
 
 *Hecho con ❤️ por la comunidad de desarrolladores de IA distribuida*
 
-</div>
 # 🧠 Neural Nexus - Core System
 
 [![Build Status](https://github.com/mechmind-dwv/core-system/actions/workflows/build.yml/badge.svg)](https://github.com/mechmind-dwv/core-system/actions)
@@ -19,6 +18,7 @@
 
 > **Plataforma de IA Distribuida para Edge Computing** que combina **inferencia descentralizada**, **eficiencia energética** y **aprendizaje federado** con procesamiento **neuromorphic**. 🚀
 
+</div>
 ## 🎯 ¿Qué es Neural Nexus?
 
 Neural Nexus revoluciona el edge computing al distribuir la inteligencia artificial directamente en los dispositivos, eliminando la dependencia de la nube y garantizando:
