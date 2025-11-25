@@ -1,147 +1,490 @@
-# 🧠 Neural Nexus - Core System
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrador de Archivos README v3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-[![Build Status](https://github.com/mechmind-dwv/core-system/actions/workflows/build.yml/badge.svg)](https://github.com/mechmind-dwv/core-system/actions)
-[![Edge Latency](https://img.shields.io/badge/edge_latency-<2ms-green)](https://neural-nexus.dev/benchmarks)
-[![Energy Efficiency](https://img.shields.io/badge/power_consumption-<5W-brightgreen)](https://neural-nexus.dev/efficiency)
-[![Rust](https://img.shields.io/badge/rust-1.70+-orange.svg)](https://www.rust-lang.org)
-[![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Discord](https://img.shields.io/discord/neural-nexus?color=7289da&label=discord)](https://discord.gg/neural-nexus)
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-> **Plataforma de IA Distribuida para Edge Computing** que combina **inferencia descentralizada**, **eficiencia energética** y **aprendizaje federado** con procesamiento **neuromorphic**. 🚀
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            background: none;
+            border: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            color: #667eea;
+            background: white;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            background: #e9ecff;
+            border-color: #5568d3;
+        }
+
+        .upload-area.dragover {
+            background: #d4d9ff;
+            border-color: #4c5ec9;
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .file-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .file-item input[type="text"] {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+
+        .file-item input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .preview-area {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .preview-area pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .info-box h4 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        .info-box ol {
+            margin-left: 20px;
+            color: #333;
+        }
+
+        .info-box li {
+            margin-bottom: 8px;
+        }
+
+        .info-box code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #d63384;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                📚 Integrador de Archivos README
+                <span class="badge">v3.0</span>
+            </h1>
+            <p>Herramienta para combinar múltiples archivos README en un documento unificado</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('upload')">
+                    📤 Subir Archivos
+                </button>
+                <button class="tab" onclick="switchTab('manage')">
+                    ✏️ Gestionar Secciones
+                </button>
+                <button class="tab" onclick="switchTab('preview')">
+                    👁️ Vista Previa
+                </button>
+            </div>
+
+            <!-- Tab 1: Upload -->
+            <div id="upload" class="tab-content active">
+                <div class="section">
+                    <h3>README Principal</h3>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="generateTemplate()">
+                            ✨ Generar Template
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearMainReadme()">
+                            🗑️ Limpiar
+                        </button>
+                    </div>
+                    <textarea id="mainReadme" rows="10" placeholder="Pega aquí tu README principal o genera un template..."></textarea>
+                </div>
+
+                <div class="section">
+                    <h3>Subir Archivos Adicionales</h3>
+                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                        <div class="upload-icon">📁</div>
+                        <p style="font-size: 1.2em; margin-bottom: 10px;">
+                            <strong>Haz clic aquí o arrastra archivos</strong>
+                        </p>
+                        <p style="color: #666;">Soporta archivos .md, .txt</p>
+                    </div>
+                    <input type="file" id="fileInput" class="file-input" multiple accept=".md,.txt" onchange="handleFileUpload(event)">
+                    
+                    <div class="button-group" style="margin-top: 20px;">
+                        <button class="btn btn-success" onclick="addManualSection()">
+                            ➕ Añadir Sección Manual
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Manage -->
+            <div id="manage" class="tab-content">
+                <div class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Secciones a Integrar</h3>
+                        <button class="btn btn-primary" onclick="integrateFiles()">
+                            🔗 Integrar Archivos
+                        </button>
+                    </div>
+                    <div id="fileList" class="file-list">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <p>No hay archivos para integrar</p>
+                            <p style="font-size: 0.9em; color: #999;">Sube algunos archivos en la pestaña anterior</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Preview -->
+            <div id="preview" class="tab-content">
+                <div class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">README Integrado</h3>
+                        <div class="button-group" style="margin: 0;">
+                            <button class="btn btn-secondary" onclick="copyToClipboard()">
+                                📋 Copiar
+                            </button>
+                            <button class="btn btn-success" onclick="downloadFile()">
+                                💾 Descargar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="preview-area">
+                        <pre id="previewContent">El README integrado aparecerá aquí después de hacer clic en "Integrar Archivos"</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="info-box">
+                <h4>💡 Cómo usar la herramienta:</h4>
+                <ol>
+                    <li>En tu README principal, usa comentarios como <code>&lt;!-- INTEGRATION_POINT:nombre-seccion --&gt;</code></li>
+                    <li>Sube los archivos que quieres integrar o créalos manualmente</li>
+                    <li>Ajusta los puntos de integración para que coincidan con los comentarios</li>
+                    <li>Haz clic en "Integrar Archivos" para generar el README final</li>
+                    <li>Descarga o copia el resultado integrado</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado de la aplicación
+        let files = [];
+        let mainReadmeContent = '';
+        let integratedContent = '';
+
+        // Inicialización
+        window.onload = function() {
+            loadInitialContent();
+            setupDragAndDrop();
+        };
+
+        // Cargar contenido inicial
+        function loadInitialContent() {
+            const initialContent = `# 🧠 Neural Nexus - Core System
+
+> **Plataforma de IA Distribuida para Edge Computing**
 
 ## 🎯 ¿Qué es Neural Nexus?
 
-Neural Nexus revoluciona el edge computing al distribuir la inteligencia artificial directamente en los dispositivos, eliminando la dependencia de la nube y garantizando:
-
-- ⚡ **Ultra-baja latencia** (< 2ms)
-- 🔋 **Eficiencia energética** (< 5W por nodo)  
-- 🛡️ **Privacidad por diseño** (datos nunca salen del edge)
-- 🌐 **Escalabilidad masiva** (miles de nodos)
-- 🧠 **Aprendizaje continuo** (federated learning)
+Neural Nexus revoluciona el edge computing.
 
 <!-- INTEGRATION_POINT:architecture -->
 <!-- INTEGRATION_POINT:quick-start -->
-<!-- INTEGRATION_POINT:project-structure -->
-<!-- INTEGRATION_POINT:tech-stack -->
-<!-- INTEGRATION_POINT:use-cases -->
-<!-- INTEGRATION_POINT:benchmarks -->
-<!-- INTEGRATION_POINT:deployment -->
-<!-- INTEGRATION_POINT:development -->
-<!-- INTEGRATION_POINT:security -->
-<!-- INTEGRATION_POINT:roadmap -->
+<!-- INTEGRATION_POINT:installation -->
+<!-- INTEGRATION_POINT:usage -->
+<!-- INTEGRATION_POINT:api -->
 <!-- INTEGRATION_POINT:contributing -->
-<!-- INTEGRATION_POINT:support -->
 <!-- INTEGRATION_POINT:license -->`;
-    
-    setMainReadme(initialContent);
-    setIntegratedContent(initialContent);
-  }, []);
 
-  const handleFileUpload = async (event) => {
-    const files = Array.from(event.target.files);
-    
-    for (const file of files) {
-      const content = await file.text();
-      const newFile = {
-        id: Date.now() + Math.random(),
-        name: file.name,
-        content: content,
-        section: extractSectionName(file.name),
-        integrationPoint: generateIntegrationPoint(file.name)
-      };
-      
-      setSubFiles(prev => [...prev, newFile]);
-    }
-  };
+            document.getElementById('mainReadme').value = initialContent;
+            mainReadmeContent = initialContent;
+        }
 
-  const extractSectionName = (filename) => {
-    // Extraer nombre de sección basado en el nombre del archivo
-    const name = filename.replace(/\.(md|txt)$/i, '');
-    return name
-      .replace(/[-_]/g, ' ')
-      .replace(/\b\w/g, l => l.toUpperCase());
-  };
-
-  const generateIntegrationPoint = (filename) => {
-    // Generar punto de integración basado en el nombre del archivo
-    return filename
-      .replace(/\.(md|txt)$/i, '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '-');
-  };
-
-  const addManualSection = () => {
-    const newFile = {
-      id: Date.now(),
-      name: 'nueva-seccion.md',
-      content: '## Nueva Sección\n\nContenido de la nueva sección...',
-      section: 'Nueva Sección',
-      integrationPoint: 'nueva-seccion'
-    };
-    
-    setSubFiles(prev => [...prev, newFile]);
-  };
-
-  const updateSubFile = (id, field, value) => {
-    setSubFiles(prev => prev.map(file => 
-      file.id === id ? { ...file, [field]: value } : file
-    ));
-  };
-
-  const deleteSubFile = (id) => {
-    setSubFiles(prev => prev.filter(file => file.id !== id));
-  };
-
-  const integrateFiles = () => {
-    let integrated = mainReadme;
-    
-    subFiles.forEach(file => {
-      const integrationPoint = `<!-- INTEGRATION_POINT:${file.integrationPoint} -->`;
-      
-      if (integrated.includes(integrationPoint)) {
-        // Reemplazar el punto de integración con el contenido
-        integrated = integrated.replace(
-          integrationPoint,
-          `${file.content}\n\n${integrationPoint}`
-        );
-      } else {
-        // Si no existe el punto de integración, agregar al final
-        integrated += `\n\n${file.content}`;
-      }
-    });
-    
-    setIntegratedContent(integrated);
-    setActiveTab('preview');
-  };
-
-  const downloadIntegratedFile = () => {
-    const blob = new Blob([integratedContent], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'README-integrated.md';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(integratedContent);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Error copying to clipboard:', err);
-    }
-  };
-
-  const generateTemplate = () => {
-    const template = `# Proyecto
+        // Generar template
+        function generateTemplate() {
+            const template = `# Proyecto
 
 ## Descripción
-<!-- INTEGRATION_POINT:description -->
+Descripción del proyecto.
 
 ## Instalación
 <!-- INTEGRATION_POINT:installation -->
@@ -158,206 +501,232 @@ Neural Nexus revoluciona el edge computing al distribuir la inteligencia artific
 ## Licencia
 <!-- INTEGRATION_POINT:license -->`;
 
-    setMainReadme(template);
-    setIntegratedContent(template);
-  };
+            document.getElementById('mainReadme').value = template;
+            mainReadmeContent = template;
+        }
 
-  return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-          <FileText className="text-blue-600" size={32} />
-          Integrador de Archivos README
-        </h1>
-        <p className="text-gray-600">
-          Herramienta para integrar múltiples archivos README y crear documentación unificada
-        </p>
-      </div>
+        // Limpiar README principal
+        function clearMainReadme() {
+            if (confirm('¿Estás seguro de que quieres limpiar el README principal?')) {
+                document.getElementById('mainReadme').value = '';
+                mainReadmeContent = '';
+            }
+        }
 
-      {/* Tabs */}
-      <div className="bg-white rounded-lg shadow-lg mb-6">
-        <div className="flex border-b">
-          {[
-            { id: 'upload', label: 'Subir Archivos', icon: Upload },
-            { id: 'manage', label: 'Gestionar Secciones', icon: Edit },
-            { id: 'preview', label: 'Vista Previa', icon: Eye }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors ${
-                activeTab === tab.id
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              <tab.icon size={20} />
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        // Cambiar de pestaña
+        function switchTab(tabName) {
+            // Ocultar todos los contenidos
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
 
-        {/* Tab Content */}
-        <div className="p-6">
-          {activeTab === 'upload' && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-xl font-semibold mb-4">README Principal</h3>
-                <div className="flex gap-4 mb-4">
-                  <button
-                    onClick={generateTemplate}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Generar Template
-                  </button>
-                </div>
-                <textarea
-                  value={mainReadme}
-                  onChange={(e) => setMainReadme(e.target.value)}
-                  className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm"
-                  placeholder="Pega aquí tu README principal o usa el template..."
-                />
-              </div>
+            // Desactivar todas las pestañas
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
 
-              <div>
-                <h3 className="text-xl font-semibold mb-4">Subir Archivos Adicionales</h3>
-                <div 
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload size={48} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600 mb-2">
-                    Haz clic para subir archivos README o suéltalos aquí
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Soporta archivos .md, .txt
-                  </p>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    accept=".md,.txt"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </div>
+            // Activar la pestaña seleccionada
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
 
-                <button
-                  onClick={addManualSection}
-                  className="mt-4 flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  <Plus size={20} />
-                  Añadir Sección Manual
-                </button>
-              </div>
-            </div>
-          )}
+            // Actualizar contenido si es necesario
+            if (tabName === 'manage') {
+                renderFileList();
+            }
+        }
 
-          {activeTab === 'manage' && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold">Secciones a Integrar</h3>
-                <button
-                  onClick={integrateFiles}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Integrar Archivos
-                </button>
-              </div>
+        // Configurar drag and drop
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
 
-              {subFiles.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  No hay archivos para integrar. Sube algunos archivos en la pestaña anterior.
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {subFiles.map(file => (
-                    <div key={file.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex-1 space-y-2">
-                          <input
-                            type="text"
-                            value={file.name}
-                            onChange={(e) => updateSubFile(file.id, 'name', e.target.value)}
-                            className="text-lg font-semibold bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none"
-                          />
-                          <input
-                            type="text"
-                            value={file.integrationPoint}
-                            onChange={(e) => updateSubFile(file.id, 'integrationPoint', e.target.value)}
-                            className="text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded border"
-                            placeholder="punto-de-integracion"
-                          />
-                        </div>
-                        <button
-                          onClick={() => deleteSubFile(file.id)}
-                          className="text-red-600 hover:text-red-800 p-1"
-                        >
-                          <Trash2 size={20} />
-                        </button>
-                      </div>
-                      <textarea
-                        value={file.content}
-                        onChange={(e) => updateSubFile(file.id, 'content', e.target.value)}
-                        className="w-full h-32 p-3 border border-gray-300 rounded-lg font-mono text-sm"
-                      />
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+        }
+
+        // Manejar subida de archivos
+        function handleFileUpload(event) {
+            handleFiles(event.target.files);
+        }
+
+        // Procesar archivos
+        async function handleFiles(fileList) {
+            for (let file of fileList) {
+                const content = await file.text();
+                const newFile = {
+                    id: Date.now() + Math.random(),
+                    name: file.name,
+                    content: content,
+                    integrationPoint: generateIntegrationPoint(file.name)
+                };
+                files.push(newFile);
+            }
+            renderFileList();
+            alert(`${fileList.length} archivo(s) añadido(s) exitosamente`);
+        }
+
+        // Generar punto de integración
+        function generateIntegrationPoint(filename) {
+            return filename
+                .replace(/\.(md|txt)$/i, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, '-');
+        }
+
+        // Añadir sección manual
+        function addManualSection() {
+            const newFile = {
+                id: Date.now(),
+                name: 'nueva-seccion.md',
+                content: '## Nueva Sección\n\nContenido de la nueva sección...',
+                integrationPoint: 'nueva-seccion'
+            };
+            files.push(newFile);
+            renderFileList();
+            switchTab('manage');
+            
+            // Activar la pestaña de gestión
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabs[1].classList.add('active');
+        }
+
+        // Renderizar lista de archivos
+        function renderFileList() {
+            const fileList = document.getElementById('fileList');
+            
+            if (files.length === 0) {
+                fileList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>No hay archivos para integrar</p>
+                        <p style="font-size: 0.9em; color: #999;">Sube algunos archivos en la pestaña anterior</p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+                `;
+                return;
+            }
 
-          {activeTab === 'preview' && (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold">README Integrado</h3>
-                <div className="flex gap-2">
-                  <button
-                    onClick={copyToClipboard}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                  >
-                    {copied ? <Check size={20} /> : <Copy size={20} />}
-                    {copied ? 'Copiado!' : 'Copiar'}
-                  </button>
-                  <button
-                    onClick={downloadIntegratedFile}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    <Download size={20} />
-                    Descargar
-                  </button>
+            fileList.innerHTML = files.map(file => `
+                <div class="file-item">
+                    <div class="file-item-header">
+                        <div style="flex: 1;">
+                            <input type="text" value="${file.name}" 
+                                   onchange="updateFileName(${file.id}, this.value)"
+                                   style="width: 100%; font-weight: bold; font-size: 1.1em;">
+                            <input type="text" value="${file.integrationPoint}" 
+                                   onchange="updateIntegrationPoint(${file.id}, this.value)"
+                                   style="width: 100%; margin-top: 5px; font-family: monospace;">
+                        </div>
+                        <button class="btn btn-danger" onclick="deleteFile(${file.id})" 
+                                style="margin-left: 15px;">
+                            🗑️
+                        </button>
+                    </div>
+                    <textarea rows="6" onchange="updateFileContent(${file.id}, this.value)"
+                              style="width: 100%;">${file.content}</textarea>
                 </div>
-              </div>
-              
-              <div className="border border-gray-300 rounded-lg">
-                <div className="bg-gray-100 px-4 py-2 border-b border-gray-300 text-sm text-gray-600">
-                  README-integrated.md
-                </div>
-                <div className="p-4 max-h-96 overflow-y-auto">
-                  <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800">
-                    {integratedContent}
-                  </pre>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+            `).join('');
+        }
 
-      {/* Instrucciones */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h4 className="font-semibold text-blue-800 mb-2">💡 Cómo usar la herramienta:</h4>
-        <ol className="list-decimal list-inside space-y-1 text-blue-700 text-sm">
-          <li>En tu README principal, usa comentarios como <code className="bg-blue-100 px-1 rounded"><!-- INTEGRATION_POINT:nombre-seccion --></code></li>
-          <li>Sube los archivos que quieres integrar o créalos manualmente</li>
-          <li>Ajusta los puntos de integración para que coincidan con los comentarios</li>
-          <li>Haz clic en "Integrar Archivos" para generar el README final</li>
-          <li>Descarga o copia el resultado integrado</li>
-        </ol>
-      </div>
-    </div>
-  );
-};
+        // Actualizar nombre de archivo
+        function updateFileName(id, newName) {
+            const file = files.find(f => f.id === id);
+            if (file) file.name = newName;
+        }
 
-export default ReadmeIntegrator;
+        // Actualizar punto de integración
+        function updateIntegrationPoint(id, newPoint) {
+            const file = files.find(f => f.id === id);
+            if (file) file.integrationPoint = newPoint;
+        }
+
+        // Actualizar contenido de archivo
+        function updateFileContent(id, newContent) {
+            const file = files.find(f => f.id === id);
+            if (file) file.content = newContent;
+        }
+
+        // Eliminar archivo
+        function deleteFile(id) {
+            if (confirm('¿Estás seguro de que quieres eliminar este archivo?')) {
+                files = files.filter(f => f.id !== id);
+                renderFileList();
+            }
+        }
+
+        // Integrar archivos
+        function integrateFiles() {
+            mainReadmeContent = document.getElementById('mainReadme').value;
+            let integrated = mainReadmeContent;
+
+            files.forEach(file => {
+                const integrationPoint = `<!-- INTEGRATION_POINT:${file.integrationPoint} -->`;
+                
+                if (integrated.includes(integrationPoint)) {
+                    integrated = integrated.replace(
+                        integrationPoint,
+                        `${file.content}\n\n${integrationPoint}`
+                    );
+                } else {
+                    integrated += `\n\n${file.content}`;
+                }
+            });
+
+            integratedContent = integrated;
+            document.getElementById('previewContent').textContent = integrated;
+
+            // Cambiar a la pestaña de vista previa
+            switchTab('preview');
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabs[2].classList.add('active');
+
+            alert('✅ Archivos integrados exitosamente');
+        }
+
+        // Copiar al portapapeles
+        function copyToClipboard() {
+            const content = document.getElementById('previewContent').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ Copiado';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                alert('Error al copiar: ' + err);
+            });
+        }
+
+        // Descargar archivo
+        function downloadFile() {
+            const content = document.getElementById('previewContent').textContent;
+            const blob = new Blob([content], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'README-integrated.md';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('✅ Archivo descargado exitosamente');
+        }
+
+        // Actualizar README principal cuando cambie
+        document.getElementById('mainReadme').addEventListener('input', (e) => {
+            mainReadmeContent = e.target.value;
+        });
+    </script>
+</body>
+</html>
