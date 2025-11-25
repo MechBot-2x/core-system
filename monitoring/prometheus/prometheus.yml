@@ -1,0 +1,33 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Prometheus mismo
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Neural Nexus Orchestrator
+  - job_name: 'neural-nexus-orchestrator'
+    static_configs:
+      - targets: ['nn-orchestrator:8080']
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  # Neural Nexus Node
+  - job_name: 'neural-nexus-node'
+    static_configs:
+      - targets: ['nn-node:8081']
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  # Node Exporter (métricas del sistema)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # cAdvisor (métricas de contenedores)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']

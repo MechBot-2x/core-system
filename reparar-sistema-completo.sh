@@ -1,3 +1,15 @@
+#!/bin/bash
+echo "🔧 REPARACIÓN COMPLETA DEL SISTEMA HELIOBIO"
+echo "=========================================="
+
+# 1. Detener todos los servicios
+echo "🛑 Deteniendo servicios..."
+docker-compose down
+
+# 2. Reparar archivo docker-compose.yml
+echo "📝 Reparando docker-compose.yml..."
+cp docker-compose.yml docker-compose.yml.backup.repair
+cat > docker-compose-fixed.yml << 'DOCKERFIX'
 version: '3.8'
 
 services:
@@ -86,3 +98,26 @@ volumes:
   prometheus_data:
   postgres_data:
   redis_data:
+DOCKERFIX
+
+# 3. Reemplazar archivo dañado
+mv docker-compose-fixed.yml docker-compose.yml
+
+# 4. Levantar servicios
+echo "🚀 Iniciando servicios reparados..."
+docker-compose up -d
+
+# 5. Esperar y configurar
+sleep 20
+
+# 6. Configurar Grafana
+echo "🔧 Configurando Grafana..."
+docker exec nn-grafana grafana cli admin reset-admin-password "HelioBio2025!" 2>/dev/null || true
+
+# 7. Verificar
+echo "✅ VERIFICACIÓN FINAL:"
+docker-compose ps | grep Up
+curl -s http://localhost:3002 >/dev/null && echo "🌐 Grafana: http://localhost:3002 (admin/HelioBio2025!)" || echo "❌ Grafana no responde"
+
+echo ""
+echo "🎉 SISTEMA REPARADO COMPLETAMENTE"

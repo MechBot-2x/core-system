@@ -1,0 +1,12 @@
+{
+  "dashboard": {
+    "title": "🌞 HelioBio Cosmic Monitor",
+    "panels": [
+      {
+        "title": "TAC Rate Colectivo",
+        "type": "stat",
+        "targets": [{"expr": "tac_rate"}]
+      }
+    ]
+  }
+}
