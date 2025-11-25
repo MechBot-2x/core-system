@@ -1,0 +1,14 @@
+{
+  "dashboard": {
+    "title": "Neural Nexus Monitoring",
+    "panels": [
+      {
+        "title": "Estado de Servicios",
+        "type": "stat",
+        "targets": [{
+          "expr": "up{job=~'.*'}"
+        }]
+      }
+    ]
+  }
+}

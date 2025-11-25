@@ -75,12 +75,20 @@ set -e
 #
 #   $ sudo sh install-docker.sh --mirror AzureChinaCloud
 #
+# --setup-repo
+#
+# Use the --setup-repo option to configure Docker's package repositories without
+# installing Docker packages. This is useful when you want to add the repository
+# but install packages separately:
+#
+#   $ sudo sh install-docker.sh --setup-repo
+#
 # ==============================================================================
 
 
 # Git commit from https://github.com/docker/docker-install when
 # the script was uploaded (Should only be modified by upload job):
-SCRIPT_COMMIT_SHA="7040dd2bf115a359317b1de84de611aeabcb7bc2"
+SCRIPT_COMMIT_SHA="7d96bd3c5235ab2121bcb855dd7b3f3f37128ed4"
 
 # strip "v" prefix if present
 VERSION="${VERSION#v}"
@@ -110,6 +118,7 @@ fi
 
 mirror=''
 DRY_RUN=${DRY_RUN:-}
+REPO_ONLY=${REPO_ONLY:-0}
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--channel)
@@ -125,6 +134,10 @@ while [ $# -gt 0 ]; do
 			;;
 		--version)
 			VERSION="${2#v}"
+			shift
+			;;
+		--setup-repo)
+			REPO_ONLY=1
 			shift
 			;;
 		--*)
@@ -492,7 +505,7 @@ do_install() {
 		ubuntu.focal|ubuntu.bionic|ubuntu.xenial|ubuntu.trusty)
 			deprecation_notice "$lsb_dist" "$dist_version"
 			;;
-		ubuntu.mantic|ubuntu.lunar|ubuntu.kinetic|ubuntu.impish|ubuntu.hirsute|ubuntu.groovy|ubuntu.eoan|ubuntu.disco|ubuntu.cosmic)
+		ubuntu.oracular|ubuntu.mantic|ubuntu.lunar|ubuntu.kinetic|ubuntu.impish|ubuntu.hirsute|ubuntu.groovy|ubuntu.eoan|ubuntu.disco|ubuntu.cosmic)
 			deprecation_notice "$lsb_dist" "$dist_version"
 			;;
 		fedora.*)
@@ -519,6 +532,11 @@ do_install() {
 				$sh_c "echo \"$apt_repo\" > /etc/apt/sources.list.d/docker.list"
 				$sh_c 'apt-get -qq update >/dev/null'
 			)
+
+			if [ "$REPO_ONLY" = "1" ]; then
+				exit 0
+			fi
+
 			pkg_version=""
 			if [ -n "$VERSION" ]; then
 				if is_dry_run; then
@@ -554,7 +572,10 @@ do_install() {
 						pkgs="$pkgs docker-compose-plugin docker-ce-rootless-extras$pkg_version"
 				fi
 				if version_gte "23.0"; then
-						pkgs="$pkgs docker-buildx-plugin docker-model-plugin"
+						pkgs="$pkgs docker-buildx-plugin"
+				fi
+				if version_gte "28.2"; then
+						pkgs="$pkgs docker-model-plugin"
 				fi
 				if ! is_dry_run; then
 					set -x
@@ -605,6 +626,11 @@ do_install() {
 					$sh_c "yum makecache"
 				fi
 			)
+
+			if [ "$REPO_ONLY" = "1" ]; then
+				exit 0
+			fi
+
 			pkg_version=""
 			if command_exists dnf; then
 				pkg_manager="dnf"

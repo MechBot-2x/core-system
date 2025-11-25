@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   # 🧠 Core Neural Nexus Services
   neural-nexus-orchestrator:
@@ -8,16 +10,8 @@ services:
     ports:
       - "8082:8080"
       - "50051:50051"
-    environment:
-      - RUST_LOG=info
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/neural_nexus
-      - REDIS_URL=redis://redis:6379
-      - MQTT_BROKER=mqtt://mosquitto:1883
-    volumes:
-      - .:/app
     networks:
       - neural-nexus
-    restart: unless-stopped
 
   neural-nexus-node:
     image: rust:1.70
@@ -26,18 +20,39 @@ services:
     command: /bin/bash -c "echo '⚡ Neural Nexus Edge Node ready' && tail -f /dev/null"
     ports:
       - "8083:8081"
-    environment:
-      - RUST_LOG=info
-      - NODE_ID=node-001
-      - ORCHESTRATOR_URL=http://neural-nexus-orchestrator:8080
-    volumes:
-      - .:/app
-    networks:
-      - neural-nexus
-    restart: unless-stopped
     depends_on:
       - neural-nexus-orchestrator
+    networks:
+      - neural-nexus
 
+  # 📊 Monitoring Stack
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nn-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=HelioBio2025!
+    ports:
+      - "3002:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - neural-nexus
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nn-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9091:9090"
+    volumes:
+      - prometheus_data:/prometheus
+    networks:
+      - neural-nexus
+
+  # 🗄️ Data Services
   postgres:
     image: postgres:15-alpine
     container_name: nn-postgres
@@ -46,17 +61,11 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     ports:
-      - "5433:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - neural-nexus
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -67,63 +76,13 @@ services:
       - redis_data:/data
     networks:
       - neural-nexus
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  mosquitto:
-    image: eclipse-mosquitto:2.0
-    container_name: nn-mosquitto
-    ports:
-      - "1884:1883"
-      - "9002:9001"
-    volumes:
-      - mosquitto_data:/mosquitto/data
-      - mosquitto_logs:/mosquitto/log
-    networks:
-      - neural-nexus
-    restart: unless-stopped
-    command: mosquitto -c /mosquitto-no-auth.conf
-
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: nn-prometheus
-    ports:
-      - "9091:9090"
-    volumes:
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.enable-lifecycle'
-    networks:
-      - neural-nexus
-    restart: unless-stopped
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: nn-grafana
-    ports:
-      - "3002:3000"      # Usando puerto 3002
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=neural_nexus_admin
-    volumes:
-      - grafana_data:/var/lib/grafana
-    networks:
-      - neural-nexus
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
-  redis_data:
-  mosquitto_data:
-  mosquitto_logs:
-  prometheus_data:
-  grafana_data:
 
 networks:
   neural-nexus:
     driver: bridge
+
+volumes:
+  grafana_data:
+  prometheus_data:
+  postgres_data:
+  redis_data:
