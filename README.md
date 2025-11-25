@@ -1,11 +1,3 @@
-<div align="center">
-
-### 🧠⚡ Neural Nexus: El Futuro del Edge Computing es Ahora
-
-**[🚀 Get Started](docs/DEPLOYMENT_GUIDE.md)** • **[📚 Documentation](docs/)** • **[💬 Discord](https://discord.gg/neural-nexus)** • **[🐙 GitHub](https://github.com/mechmind-dwv/core-system)**
-
-*Hecho con ❤️ por la comunidad de desarrolladores de IA distribuida*
-
 # 🧠 Neural Nexus - Core System
 
 [![Build Status](https://github.com/mechmind-dwv/core-system/actions/workflows/build.yml/badge.svg)](https://github.com/mechmind-dwv/core-system/actions)
@@ -18,7 +10,6 @@
 
 > **Plataforma de IA Distribuida para Edge Computing** que combina **inferencia descentralizada**, **eficiencia energética** y **aprendizaje federado** con procesamiento **neuromorphic**. 🚀
 
-</div>
 ## 🎯 ¿Qué es Neural Nexus?
 
 Neural Nexus revoluciona el edge computing al distribuir la inteligencia artificial directamente en los dispositivos, eliminando la dependencia de la nube y garantizando:
@@ -350,3 +341,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+---
+
+<div align="center">
+
+### 🧠⚡ Neural Nexus: El Futuro del Edge Computing es Ahora
+
+**[🚀 Get Started](docs/DEPLOYMENT_GUIDE.md)** • **[📚 Documentation](docs/)** • **[💬 Discord](https://discord.gg/neural-nexus)** • **[🐙 GitHub](https://github.com/mechmind-dwv/core-system)**
+
+*Hecho con ❤️ por la comunidad de desarrolladores de IA distribuida*
+
+</div>
