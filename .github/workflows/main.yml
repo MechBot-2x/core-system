@@ -23,7 +23,7 @@ jobs:
         rust-version: [stable, beta]
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
@@ -71,7 +71,7 @@ jobs:
         python-version: [3.8, 3.9, "3.10", "3.11"]
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
@@ -140,7 +140,7 @@ jobs:
             target: x86_64-pc-windows-msvc
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
@@ -174,7 +174,7 @@ jobs:
     needs: [test-rust, test-python]
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -229,7 +229,7 @@ jobs:
         device: [raspberry-pi, jetson, generic]
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -262,7 +262,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Deploy to staging
       run: |
@@ -287,7 +287,7 @@ jobs:
     needs: [test-rust]
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
@@ -323,7 +323,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Rust security audit
       uses: actions-rs/audit@v1
@@ -347,7 +347,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
     
@@ -378,7 +378,7 @@ jobs:
         python-version: [3.8, 3.11]
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -401,7 +401,7 @@ jobs:
     if: github.event_name == 'release'
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Download artifacts
       uses: actions/download-artifact@v6
@@ -425,7 +425,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Set up Python
       uses: actions/setup-python@v4
