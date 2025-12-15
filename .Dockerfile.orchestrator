@@ -1,5 +1,5 @@
 # Usa una imagen base oficial de Rust
-FROM rust:1.70-alpine AS builder
+FROM rust:1.92-alpine AS builder
 
 # Instala dependencias del sistema
 RUN apk add --no-cache \
