@@ -1,36 +1,58 @@
-# Entornos
+# Entornos virtuales
 .venv/
 venv/
 env/
 ENV/
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Node
 node_modules/
 npm-debug.log*
+yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
+.npm/
+.yarn/
 
 # Python
 __pycache__/
 *.py[cod]
-*.egg-info/
+*$py.class
+*.so
+.Python
+build/
+dist/
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
 
 # Rust
 target/
+**/*.rs.bk
+Cargo.lock.bak
 
 # Secretos
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 *.key
 *.pem
+*.crt
+*.p12
 
-# Backups
+# Backups (no subir)
 *.backup
 *.backup.*
+*.orig
 *~
+*.bak
 frontend-backup/
+*.yml.backup*
 
 # Binarios grandes
 lucide-react
@@ -39,7 +61,32 @@ ort
 *.so
 *.dll
 *.dylib
+*.exe
+*.bin
 
-# Sistema
+# Datos y logs
+*.log
+*.sqlite
+*.db
+logs/
+data/
+tmp/
+temp/
+
+# Docker
+docker-compose.override.yml
+
+# K8s secretos locales
+k8s/**/secrets.yaml
+k8s/**/*secret*.yaml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 .DS_Store
 Thumbs.db
+
+# Termux/Android local
+'**Plataforma'
