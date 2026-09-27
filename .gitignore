@@ -1,51 +1,45 @@
-# Dependencies
+# Entornos
+.venv/
+venv/
+env/
+ENV/
+
+# Node
 node_modules/
-lucide-react/
-react/
-frontend/node_modules/
-frontend-backup/node_modules/
+npm-debug.log*
+yarn-error.log*
 
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
 
-# Docker
-.docker/
+# Rust
+target/
 
-# Logs
-*.log
-logs/
+# Secretos
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
 
-# OS
+# Backups
+*.backup
+*.backup.*
+*~
+frontend-backup/
+
+# Binarios grandes
+lucide-react
+react
+ort
+*.so
+*.dll
+*.dylib
+
+# Sistema
 .DS_Store
 Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Large files
-*.map
-*.js.map
-frontend/package-lock.json
-frontend-backup/package-lock.json
-
-# Temporary files
-tmp/
-temp/
-venv/
-.venv/
-venv/
-.venv/
-__pycache__/
-*.pyc
-minikube-linux-amd64
-minikube-*
